@@ -1,0 +1,6 @@
+fastapi
+uvicorn[standard]
+scikit-learn==0.24.1
+nltk
+numpy
+scipy
