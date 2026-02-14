@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
 import "./App.css";
 
-const API_BASE = "https://fake-news-detection-90c606d65a5a.herokuapp.com";
+const API_BASE = "https://fake-news-detection-90c606d65a5a.herokuapp.com/";
 
 export default function App() {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null); // { prediction, label, confidence, ms }
+  const [result, setResult] = useState(null);
   const [error, setError] = useState("");
 
   const stats = useMemo(() => {
@@ -35,15 +35,12 @@ export default function App() {
 
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data?.detail || "Prediction failed.");
-
       setResult(data);
     } catch (e) {
-      // If CORS blocks, fetch throws TypeError("Failed to fetch")
       const msg = e?.message || "Something went wrong.";
-      setError(
-        msg === "Failed to fetch"
-          ? "Failed to reach backend. This is usually CORS or backend downtime."
-          : msg
+      setError(msg === "Failed to fetch"
+        ? "Failed to reach backend. This is usually CORS or backend downtime."
+        : msg
       );
     } finally {
       setLoading(false);
@@ -69,107 +66,99 @@ export default function App() {
     !result ? "badge" : result.prediction === 0 ? "badge reliable" : "badge unreliable";
 
   return (
-    <div className="page">
-      <header className="header">
-        <div className="brand">
-          <h1>Fake News Detector</h1>
-          <p className="sub">
-            Powered by FastAPI on Heroku. Frontend hosted on GitHub Pages.
-          </p>
-        </div>
-
-        <div className="topActions" aria-label="API links">
-          <a className="chipLink" href={`${API_BASE}/docs`} target="_blank" rel="noreferrer">
-            Docs
-          </a>
-          <a className="chipLink" href={`${API_BASE}/health`} target="_blank" rel="noreferrer">
-            Health
-          </a>
-        </div>
-      </header>
-
-      <main className="grid">
-        <section className="card">
-          <div className="row">
-            <h2>Paste news text</h2>
-            <div className="muted">
-              {stats.words} words • {stats.chars} chars
-            </div>
+    <div className="shell">
+      <div className="page">
+        <header className="header">
+          <div className="brand">
+            <h1>Fake News Detector</h1>
+            <p className="sub">
+              Powered by FastAPI on Heroku. Frontend hosted on GitHub Pages.
+            </p>
           </div>
 
-          <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Paste the news content here..."
-          />
-
-          <div className="actions">
-            <button className="ghost" onClick={fillExample} disabled={loading}>
-              Try example
-            </button>
-            <button className="ghost" onClick={clearAll} disabled={loading || !text}>
-              Clear
-            </button>
-            <button className="primary" onClick={predict} disabled={loading}>
-              {loading ? "Predicting..." : "Predict"}
-            </button>
+          <div className="topActions" aria-label="API links">
+            <a className="chipLink" href={`${API_BASE}/docs`} target="_blank" rel="noreferrer">
+              Docs
+            </a>
+            <a className="chipLink" href={`${API_BASE}/health`} target="_blank" rel="noreferrer">
+              Health
+            </a>
           </div>
+        </header>
 
-          {error && (
-            <div className="error">
-              <div className="errorTitle">Request failed</div>
-              <div className="errorBody">{error}</div>
-              <div className="errorHint">
-                If your backend is live, this is most likely a CORS setting issue.
+        <main className="grid">
+          <section className="card">
+            <div className="row">
+              <h2>Paste news text</h2>
+              <div className="muted">
+                {stats.words} words • {stats.chars} chars
               </div>
             </div>
-          )}
-        </section>
 
-        <section className="card">
-          <h2>Result</h2>
+            <textarea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="Paste the news content here..."
+            />
 
-          {!result ? (
-            <div className="empty">
-              No prediction yet. Enter text and click <b>Predict</b>.
+            <div className="actions">
+              <button className="ghost" onClick={fillExample} disabled={loading}>
+                Try example
+              </button>
+              <button className="ghost" onClick={clearAll} disabled={loading || !text}>
+                Clear
+              </button>
+              <button className="primary" onClick={predict} disabled={loading}>
+                {loading ? "Predicting..." : "Predict"}
+              </button>
             </div>
-          ) : (
-            <>
-              <div className={badgeClass}>
-                <span className="badgeMain">{result.label}</span>
-                <span className="pill">class: {result.prediction}</span>
-                <span className="pill">{result.ms} ms</span>
-              </div>
 
-              <div className="meter">
-                <div className="meterTop">
-                  <span className="muted">Confidence</span>
-                  <span className="muted">{confPct}%</span>
-                </div>
-                <div className="bar">
-                  <div className="fill" style={{ width: `${confPct}%` }} />
-                </div>
-                <p className="hint">
-                  Confidence is probability — useful signal, not absolute truth.
-                </p>
+            {error && (
+              <div className="error">
+                <div className="errorTitle">Request failed</div>
+                <div className="errorBody">{error}</div>
               </div>
+            )}
+          </section>
 
-              <div className="tipBox">
-                <div className="tipTitle">UX tip</div>
-                <div className="tipBody">
-                  Paste at least one full paragraph. Very short text often produces noisy results.
-                </div>
+          <section className="card">
+            <h2>Result</h2>
+
+            {!result ? (
+              <div className="empty">
+                No prediction yet. Enter text and click <b>Predict</b>.
               </div>
-            </>
-          )}
-        </section>
-      </main>
+            ) : (
+              <>
+                <div className={badgeClass}>
+                  <span className="badgeMain">{result.label}</span>
+                  <span className="pill">class: {result.prediction}</span>
+                  <span className="pill">{result.ms} ms</span>
+                </div>
 
-      <footer className="footer">
-        <span>Frontend: GitHub Pages</span>
-        <span className="dot">•</span>
-        <span>Backend: Heroku</span>
-      </footer>
+                <div className="meter">
+                  <div className="meterTop">
+                    <span className="muted">Confidence</span>
+                    <span className="muted">{confPct}%</span>
+                  </div>
+                  <div className="bar">
+                    <div className="fill" style={{ width: `${confPct}%` }} />
+                  </div>
+                  <p className="hint">
+                    Confidence is probability — useful signal, not absolute truth.
+                  </p>
+                </div>
+              </>
+            )}
+          </section>
+        </main>
+
+        <footer className="footer">
+          <span>Frontend: GitHub Pages</span>
+          <span className="dot">•</span>
+          <span>Backend: Heroku</span>
+        </footer>
+      </div>
     </div>
   );
 }
