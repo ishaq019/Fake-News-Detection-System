@@ -19,11 +19,17 @@ app = FastAPI(
 # ✅ For local dev allow all. For production, lock to your GitHub Pages domain.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://ishaq019.github.io",
+        "https://ishaq019.github.io/Fake-News-Detection-System",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
     allow_credentials=False,
-    allow_methods=["GET", "POST"],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
+
 
 BASE_DIR = Path(__file__).resolve().parent
 STEMMER = PorterStemmer()
