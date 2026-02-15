@@ -27,7 +27,7 @@ export default function App() {
 
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/predict`, {
+      const res = await fetch(`https://fake-news-detection-90c606d65a5a.herokuapp.com/predict`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: trimmed }),
