@@ -1,8 +1,0 @@
-fastapi
-uvicorn[standard]
-gunicorn
-scikit-learn==1.7.1
-nltk
-numpy
-scipy
-pydantic

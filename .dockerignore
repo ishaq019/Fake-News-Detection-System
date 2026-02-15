@@ -1,0 +1,13 @@
+.git
+.venv
+**/.venv
+__pycache__
+**/__pycache__
+*.pyc
+node_modules
+**/node_modules
+dist
+**/dist
+.env
+nltk_data
+**/nltk_data
