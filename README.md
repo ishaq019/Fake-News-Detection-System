@@ -35,283 +35,237 @@ A full-stack web app (**React SPA + FastAPI API**) that classifies news text as 
 
 ## 🏗️ Architecture
 
+```text
 Browser (React SPA)
   -> FastAPI (Vercel): POST /predict
     -> preprocess text (regex + stopwords + stemming)
     -> TF-IDF transform (vector.pkl)
     -> Logistic Regression inference (model.pkl)
   <- JSON response (label + confidence + latency)
+```
 
-📚 API Reference
+## 📚 API Reference
 
-Base URL: https://backend-hosting-fake-news-detection.vercel.app
+**Base URL:** https://backend-hosting-fake-news-detection.vercel.app
 
-GET /
+### GET `/`
 
 Returns a basic message.
 
-Response (200):
-
+**Response (200):**
+```json
 { "message": "API running. See /docs. Use POST /predict." }
+```
 
-GET /health
+### GET `/health`
 
 Health check.
 
-Response (200):
-
+**Response (200):**
+```json
 { "ok": true }
+```
 
-GET /meta
+### GET `/meta`
 
 Runtime metadata.
 
-Response (200):
-
+**Response (200):**
+```json
 {
   "model": "LogisticRegression",
   "vectorizer": "TfidfVectorizer",
   "labels": { "0": "Reliable", "1": "Unreliable" }
 }
+```
 
-POST /predict
+### POST `/predict`
 
 Predict classification for input text.
 
-Request Body
+#### Request Body
 
-Field	Type	Constraints
+| Field | Type | Constraints |
+|---|---|---|
+| `text` | string | 10–20000 chars |
 
-text	string	10–20000 chars
+#### Response Body
 
+| Field | Type | Meaning |
+|---|---|---|
+| `prediction` | int | 0 = Reliable, 1 = Unreliable |
+| `label` | string | Human label |
+| `confidence` | float | Max predicted probability (if available) |
+| `ms` | int | Inference time (ms) |
 
-Response Body
+#### Example Request
 
-Field	Type	Meaning
-
-prediction	int	0 = Reliable, 1 = Unreliable
-label	string	Human label
-confidence	float	Max predicted probability (if available)
-ms	int	Inference time (ms)
-
-
-Example Request
-
+```bash
 curl -X POST "https://backend-hosting-fake-news-detection.vercel.app/predict" \
   -H "Content-Type: application/json" \
   -d '{"text":"This is a sample news paragraph long enough to test prediction."}'
+```
 
-Example Response
+#### Example Response
 
+```json
 { "prediction": 1, "label": "Unreliable", "confidence": 0.88, "ms": 15 }
+```
 
-🚀 Installation & Usage
+## 🚀 Installation & Usage
 
-✅ Prerequisites
+### ✅ Prerequisites
 
-Tool	Recommended
+| Tool | Recommended |
+|---|---|
+| Python | 3.10+ (3.11 ideal) |
+| Node.js | 18+ |
+| Git | Latest |
 
-Python	3.10+ (3.11 ideal)
-Node.js	18+
-Git	Latest
-
-
-🧪 Run Backend (FastAPI) Locally
+## 🧪 Run Backend (FastAPI) Locally
 
 1. Install dependencies:
-
-pip install -r requirements.txt
-
+   ```bash
+   pip install -r requirements.txt
+   ```
 
 2. Start the API:
-
-python -m uvicorn api.main:app --reload --host 127.0.0.1 --port 8000
-
+   ```bash
+   python -m uvicorn api.main:app --reload --host 127.0.0.1 --port 8000
+   ```
 
 3. Validate:
+   - http://127.0.0.1:8000/health  
+   - http://127.0.0.1:8000/docs
 
-http://127.0.0.1:8000/health
+## 🖥️ Run Frontend (React) Locally
 
-http://127.0.0.1:8000/docs
-
-
-
-
-🖥️ Run Frontend (React) Locally
-
-From your frontend directory (example: fake-news-ui/):
+From your frontend directory (example: `fake-news-ui/`):
 
 1. Install:
-
-npm install
-
+   ```bash
+   npm install
+   ```
 
 2. Start dev server:
-
-npm run dev
-
+   ```bash
+   npm run dev
+   ```
 
 3. Configure API base URL:
+   - Local backend: `http://127.0.0.1:8000`
+   - Production backend: `https://backend-hosting-fake-news-detection.vercel.app`
 
-Local backend: http://127.0.0.1:8000
+**Tip:** keep API URL in an env var like `VITE_API_BASE_URL` (Vite) or `REACT_APP_API_BASE_URL` (CRA), and commit a `.env.example`.
 
-Production backend: https://backend-hosting-fake-news-detection.vercel.app
+## ✅ End-user Flow
 
-
-
-
-Tip: keep API URL in an env var like VITE_API_BASE_URL (Vite) or REACT_APP_API_BASE_URL (CRA), and commit a .env.example.
-
-✅ End-user Flow
-
-1. Open the frontend: https://syedishaq.me/Fake-News-Detection-System/
-
-
-2. Paste a news paragraph (≥ 10 characters)
-
-
-3. Click Predict
-
-
+1. Open the frontend: https://syedishaq.me/Fake-News-Detection-System/  
+2. Paste a news paragraph (≥ 10 characters)  
+3. Click **Predict**  
 4. View:
+   - classification (Reliable/Unreliable)
+   - confidence score
+   - response time (ms)
 
-classification (Reliable/Unreliable)
+## 🧠 ML Pipeline
 
-confidence score
+| Stage | Details |
+|---|---|
+| Labels | 0 = Reliable (True), 1 = Unreliable (Fake) |
+| Preprocessing | letters-only regex → lowercase → stopwords removal → Porter stemming |
+| Vectorizer | `TfidfVectorizer(max_features=10000, ngram_range=(1,2))` |
+| Model | `LogisticRegression(max_iter=2000, n_jobs=1)` |
+| Artifacts | `vector.pkl`, `model.pkl` |
 
-response time (ms)
-
-
-
-
-🧠 ML Pipeline
-
-Stage	Details
-
-Labels	0 = Reliable (True), 1 = Unreliable (Fake)
-Preprocessing	letters-only regex → lowercase → stopwords removal → Porter stemming
-Vectorizer	TfidfVectorizer(max_features=10000, ngram_range=(1,2))
-Model	LogisticRegression(max_iter=2000, n_jobs=1)
-Artifacts	vector.pkl, model.pkl
-
-
-📈 Model Performance
+## 📈 Model Performance
 
 Training run reported:
 
-Metric	Value
-
-Accuracy	0.9893
-
+| Metric | Value |
+|---|---|
+| Accuracy | 0.9893 |
 
 Classification report (summary):
 
-Class 0 (Reliable): precision 0.9859, recall 0.9921, f1 0.9889
+- Class 0 (Reliable): precision 0.9859, recall 0.9921, f1 0.9889  
+- Class 1 (Unreliable): precision 0.9925, recall 0.9867, f1 0.9896
 
-Class 1 (Unreliable): precision 0.9925, recall 0.9867, f1 0.9896
+## 🌍 Deployment Notes
 
+### Frontend (GitHub Pages under custom domain path)
 
-🌍 Deployment Notes
+- Hosted at: https://syedishaq.me/Fake-News-Detection-System/  
+- **Gotcha:** GitHub Pages sub-path hosting requires correct base path configuration. If wrong, JS/CSS assets may 404 and the page can render blank.
 
-Frontend (GitHub Pages under custom domain path)
+### Backend (Vercel)
 
-Hosted at: https://syedishaq.me/Fake-News-Detection-System/
+- Hosted at: https://backend-hosting-fake-news-detection.vercel.app/
 
-Gotcha: GitHub Pages sub-path hosting requires correct base path configuration. If wrong, JS/CSS assets may 404 and the page can render blank.
+**Important checks**
+- `model.pkl` and `vector.pkl` must ship with the deployment
+- NLTK stopwords must be available (build-time download or runtime fallback)
+- CORS must allow the origin: `https://syedishaq.me` *(origin has no path)*
 
-Backend (Vercel)
+## 🧯 Troubleshooting
 
-Hosted at: https://backend-hosting-fake-news-detection.vercel.app/
+| Problem | Symptom | Fix |
+|---|---|---|
+| CORS blocked | “Request failed / Failed to reach backend” | Allow origin `https://syedishaq.me` in backend CORS |
+| GitHub Pages blank | Console shows JS/CSS 404 | Set correct base path for subfolder deployment |
+| NLTK stopwords missing | `LookupError: stopwords` | Download stopwords at build or add runtime fallback |
+| Artifacts missing | Backend fails at startup | Ensure `model.pkl` + `vector.pkl` exist where expected |
 
-Important checks
+## 🔐 Security Note (Pickle)
 
-model.pkl and vector.pkl must ship with the deployment
+Pickle files can execute arbitrary code when loaded. Never load untrusted `.pkl` files and keep `model.pkl` / `vector.pkl` under your control.
 
-NLTK stopwords must be available (build-time download or runtime fallback)
-
-CORS must allow the origin: https://syedishaq.me (origin has no path)
-
-
-🧯 Troubleshooting
-
-Problem	Symptom	Fix
-
-CORS blocked	“Request failed / Failed to reach backend”	Allow origin https://syedishaq.me in backend CORS
-GitHub Pages blank	Console shows JS/CSS 404	Set correct base path for subfolder deployment
-NLTK stopwords missing	LookupError: stopwords	Download stopwords at build or add runtime fallback
-Artifacts missing	Backend fails at startup	Ensure model.pkl + vector.pkl exist where expected
-
-
-🔐 Security Note (Pickle)
-
-Pickle files can execute arbitrary code when loaded. Never load untrusted .pkl files and keep model.pkl / vector.pkl under your control.
-
-🤝 Contributing
+## 🤝 Contributing
 
 1. Fork the repository
-
-
 2. Create a feature branch:
-
-git checkout -b feature/your-feature-name
-
-
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
 3. Commit changes:
-
-git commit -m "Add: "
-
-
+   ```bash
+   git commit -m "Add: "
+   ```
 4. Push and open a Pull Request
 
+**Guidelines**
+- Keep PRs small and focused
+- Add screenshots for UI changes
+- Add request/response examples for API changes
+- Do not commit secrets (tokens/keys)
 
+## 📬 Contact
 
-Guidelines
+| Type | Details |
+|---|---|
+| Name | Ishaq |
+| Website | https://syedishaq.me |
+| GitHub | https://github.com/ishaq019 |
+| Repository | https://github.com/ishaq019/Fake-News-Detection-System |
 
-Keep PRs small and focused
+## 🧾 Assumptions
 
-Add screenshots for UI changes
+- Backend entrypoint is `api.main:app` (FastAPI)
+- Frontend is a React SPA deployed under the GitHub Pages sub-path
 
-Add request/response examples for API changes
+## 🧭 Next Steps
 
-Do not commit secrets (tokens/keys)
+- Add `.env.example` for frontend/backend configuration (API base URL, allowed origins)
+- Add CI/CD (GitHub Actions) for automated frontend deploy and backend validation
+- Add tests for `/predict` with sample inputs and expected response shape
 
+## 🎨 Generate the README Banner (DALL·E Prompt)
 
-📬 Contact
+Save the generated image as: `assets/banner.png`
 
-Type	Details
-
-Name	Ishaq
-Website	https://syedishaq.me
-GitHub	https://github.com/ishaq019
-Repository	https://github.com/ishaq019/Fake-News-Detection-System
-
-
-🧾 Assumptions
-
-Backend entrypoint is api.main:app (FastAPI)
-
-Frontend is a React SPA deployed under the GitHub Pages sub-path
-
-
-🧭 Next Steps
-
-Add .env.example for frontend/backend configuration (API base URL, allowed origins)
-
-Add CI/CD (GitHub Actions) for automated frontend deploy and backend validation
-
-Add tests for /predict with sample inputs and expected response shape
-
-
-🎨 Generate the README Banner (DALL·E Prompt)
-
-Save the generated image as: assets/banner.png
-
-Prompt:
-
+**Prompt:**
 > A modern flat vector banner for a “Fake News Detection System” web app. Include subtle icons: newspaper, shield/checkmark for reliable, warning triangle for unreliable, and small AI/ML nodes. Clean white background, minimal pastel accents, professional tech style, wide aspect ratio 3:1, no photorealism, no text artifacts.
 
+## 📄 License
 
-
-📄 License
-
-Add a license file if you plan to open-source this project (MIT is common). (If you already have one, link it here.)
+Add a license file if you plan to open-source this project (MIT is common). *(If you already have one, link it here.)*
