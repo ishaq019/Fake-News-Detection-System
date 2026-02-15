@@ -40,211 +40,294 @@ A full-stack web application (**React frontend + FastAPI backend**) that classif
 
 ## Architecture Overview
 
-Browser (React SPA) -> FastAPI (Vercel): POST /predict -> preprocess text (regex + stopwords + stemming) -> TF-IDF transform (vector.pkl) -> Logistic Regression inference (model.pkl) <- JSON response (label + confidence + latency)
+Browser (React SPA)
+  -> FastAPI (Vercel): POST /predict
+     -> preprocess text (regex + stopwords + stemming)
+     -> TF-IDF transform (vector.pkl)
+     -> Logistic Regression inference (model.pkl)
+  <- JSON response (label + confidence + latency)
+
 
 ---
 
-## API Reference
+API Reference
 
-### Base URL
-`https://backend-hosting-fake-news-detection.vercel.app`
+Base URL
 
-### Endpoints
+https://backend-hosting-fake-news-detection.vercel.app
 
-#### `GET /`
+GET /
+
 Returns a basic message.
 
-**Response (200):**
+Response (200):
 
+{ "message": "API running. See /docs. Use POST /predict." }
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   { "message": "API running. See /docs. Use POST /predict." }   `
-
-#### GET /health
+GET /health
 
 Health check.
 
-**Response (200):**
+Response (200):
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   { "ok": true }   `
+{ "ok": true }
 
-#### GET /meta
+GET /meta
 
 Runtime metadata (model/vectorizer types and label mapping).
 
-**Response (200):**
+Response (200):
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   {    "model": "LogisticRegression",    "vectorizer": "TfidfVectorizer",    "labels": { "0": "Reliable", "1": "Unreliable" }  }   `
+{
+  "model": "LogisticRegression",
+  "vectorizer": "TfidfVectorizer",
+  "labels": { "0": "Reliable", "1": "Unreliable" }
+}
 
-#### POST /predict
+POST /predict
 
 Predict classification for input text.
 
-**Request Body**
+Request Body
 
-FieldTypeConstraintstextstring10â€“20000 chars
+Field	Type	Constraints
 
-**Response Body**
+text	string	10–20000 chars
 
-FieldTypeMeaningpredictionint0 = Reliable, 1 = UnreliablelabelstringHuman labelconfidencefloatMax predicted probability (if available)msintInference time (ms)
 
-**Example Request**
+Response Body
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   curl -X POST "https://backend-hosting-fake-news-detection.vercel.app/predict" \    -H "Content-Type: application/json" \    -d "{\"text\":\"This is a sample news paragraph long enough to test prediction.\"}"   `
+Field	Type	Meaning
 
-**Example Response**
+prediction	int	0 = Reliable, 1 = Unreliable
+label	string	Human label
+confidence	float	Max predicted probability (if available)
+ms	int	Inference time (ms)
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   {    "prediction": 1,    "label": "Unreliable",    "confidence": 0.88,    "ms": 15  }   `
+
+Example Request
+
+curl -X POST "https://backend-hosting-fake-news-detection.vercel.app/predict" \
+  -H "Content-Type: application/json" \
+  -d "{\"text\":\"This is a sample news paragraph long enough to test prediction.\"}"
+
+Example Response
+
+{
+  "prediction": 1,
+  "label": "Unreliable",
+  "confidence": 0.88,
+  "ms": 15
+}
+
+
+---
 
 Installation & Usage
---------------------
 
-### Prerequisites
+Prerequisites
 
-ToolRecommendedPython3.10+ (3.11 ideal)Node.js18+GitLatest
+Tool	Recommended
 
-### Backend (FastAPI) â€” Run Locally
+Python	3.10+ (3.11 ideal)
+Node.js	18+
+Git	Latest
 
-1.  Install dependencies:
-    
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   pip install -r requirements.txt   `
+Backend (FastAPI) — Run Locally
 
-1.  Start the API:
-    
+1. Install dependencies:
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   python -m uvicorn api.main:app --reload --host 127.0.0.1 --port 8000   `
 
-1.  Validate:
-    
 
-*   Health: [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health)
-    
-*   Docs: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-    
+pip install -r requirements.txt
 
-### Frontend (React) â€” Run Locally
+2. Start the API:
+
+
+
+python -m uvicorn api.main:app --reload --host 127.0.0.1 --port 8000
+
+3. Validate:
+
+
+
+http://127.0.0.1:8000/health
+
+http://127.0.0.1:8000/docs
+
+
+Frontend (React) — Run Locally
 
 From your frontend directory (example: fake-news-ui/):
 
-1.  Install:
-    
+1. Install:
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   npm install   `
 
-1.  Start dev server:
-    
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   npm run dev   `
+npm install
 
-1.  Set the API base URL in the frontend:
-    
+2. Start dev server:
 
-*   Local dev backend: http://127.0.0.1:8000
-    
-*   Production backend: https://backend-hosting-fake-news-detection.vercel.app
-    
 
-### Using the App (End-user Flow)
 
-1.  Open the frontend URL
-    
-2.  Paste a news paragraph (â‰¥ 10 characters)
-    
-3.  Click **Predict**
-    
-4.  View:
-    
-    *   classification (Reliable/Unreliable)
-        
-    *   confidence score
-        
-    *   response time
-        
+npm run dev
+
+3. Configure API base URL:
+
+
+
+Local backend: http://127.0.0.1:8000
+
+Production backend: https://backend-hosting-fake-news-detection.vercel.app
+
+
+End-user Flow
+
+1. Open the frontend URL
+
+
+2. Paste a news paragraph (≥ 10 characters)
+
+
+3. Click Predict
+
+
+4. View:
+
+classification (Reliable/Unreliable)
+
+confidence score
+
+response time
+
+
+
+
+
+---
 
 ML Pipeline
------------
 
-StageDetailsLabels0 = Reliable (True), 1 = Unreliable (Fake)Preprocessingletters-only regex â†’ lowercase â†’ stopwords removal â†’ Porter stemmingVectorizerTfidfVectorizer(max\_features=10000, ngram\_range=(1,2))ModelLogisticRegression(max\_iter=2000, n\_jobs=1)Artifactsvector.pkl, model.pkl
+Stage	Details
+
+Labels	0 = Reliable (True), 1 = Unreliable (Fake)
+Preprocessing	letters-only regex → lowercase → stopwords removal → Porter stemming
+Vectorizer	TfidfVectorizer(max_features=10000, ngram_range=(1,2))
+Model	LogisticRegression(max_iter=2000, n_jobs=1)
+Artifacts	vector.pkl, model.pkl
+
+
+
+---
 
 Model Performance
------------------
 
 Training run reported:
 
-MetricValueAccuracy**0.9893**
+Metric	Value
 
-**Classification Report (summary):**
+Accuracy	0.9893
 
-*   Class 0 (Reliable): precision **0.9859**, recall **0.9921**, f1 **0.9889**
-    
-*   Class 1 (Unreliable): precision **0.9925**, recall **0.9867**, f1 **0.9896**
-    
+
+Classification report (summary)
+
+Class 0 (Reliable): precision 0.9859, recall 0.9921, f1 0.9889
+
+Class 1 (Unreliable): precision 0.9925, recall 0.9867, f1 0.9896
+
+
+
+---
 
 Deployment
-----------
 
-### Frontend (GitHub Pages under custom domain path)
-
-Hosted at:
-
-*   [https://syedishaq.me/Fake-News-Detection-System/](https://syedishaq.me/Fake-News-Detection-System/)
-    
-
-**Important:** GitHub Pages sub-path hosting requires correct base path configuration; otherwise JS/CSS assets may 404 and the page may render blank.
-
-### Backend (Vercel)
+Frontend (GitHub Pages under custom domain path)
 
 Hosted at:
 
-*   [https://backend-hosting-fake-news-detection.vercel.app/](https://backend-hosting-fake-news-detection.vercel.app/)
-    
+https://syedishaq.me/Fake-News-Detection-System/
 
-**Important checks:**
 
-*   model.pkl and vector.pkl must be included in deployment
-    
-*   NLTK stopwords must be available (build-time download or runtime fallback)
-    
-*   CORS must allow the origin: https://syedishaq.me (origin has no path)
-    
+Important: GitHub Pages sub-path hosting requires correct base path configuration; otherwise JS/CSS assets may 404 and the page may render blank.
+
+Backend (Vercel)
+
+Hosted at:
+
+https://backend-hosting-fake-news-detection.vercel.app/
+
+
+Important checks
+
+model.pkl and vector.pkl must be included in deployment
+
+NLTK stopwords must be available (build-time download or runtime fallback)
+
+CORS must allow the origin: https://syedishaq.me (origin has no path)
+
+
+
+---
 
 Troubleshooting
----------------
 
-ProblemSymptomFixCORS blockedâ€œRequest failed / Failed to reach backendâ€Allow origin https://syedishaq.me in backend CORSGitHub Pages blankConsole shows JS/CSS 404Set correct base path for subfolder deploymentNLTK stopwords missingLookupError: stopwordsDownload stopwords at build or add runtime fallbackArtifacts missingBackend fails at startupEnsure model.pkl + vector.pkl exist in expected location
+Problem	Symptom	Fix
+
+CORS blocked	“Request failed / Failed to reach backend”	Allow origin https://syedishaq.me in backend CORS
+GitHub Pages blank	Console shows JS/CSS 404	Set correct base path for subfolder deployment
+NLTK stopwords missing	LookupError: stopwords	Download stopwords at build or add runtime fallback
+Artifacts missing	Backend fails at startup	Ensure model.pkl + vector.pkl exist in expected location
+
+
+
+---
 
 Contributing
-------------
 
-1.  Fork the repository
-    
-2.  Create a feature branch:
-    
+1. Fork the repository
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   git checkout -b feature/your-feature-name   `
 
-1.  Make changes and commit:
-    
+2. Create a feature branch:
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   git commit -m "Add: "   `
 
-1.  Push and open a Pull Request.
-    
 
-**Guidelines**
+git checkout -b feature/your-feature-name
 
-*   Keep PRs small and focused
-    
-*   Add screenshots for UI changes
-    
-*   Add request/response examples for API changes
-    
-*   Do not commit secrets (tokens/keys)
-    
+3. Commit changes:
+
+
+
+git commit -m "Add: <short description>"
+
+4. Push and open a Pull Request
+
+
+
+Guidelines
+
+Keep PRs small and focused
+
+Add screenshots for UI changes
+
+Add request/response examples for API changes
+
+Do not commit secrets (tokens/keys)
+
+
+
+---
 
 Contact
--------
 
-TypeDetailsNameIshaqWebsite[https://syedishaq.me](https://syedishaq.me)GitHub[https://github.com/ishaq019](https://github.com/ishaq019)Repository[https://github.com/ishaq019/Fake-News-Detection-System](https://github.com/ishaq019/Fake-News-Detection-System)
+Type	Details
 
-\-
+Name	Ishaq
+Website	https://syedishaq.me
+GitHub	https://github.com/ishaq019
+Repository	https://github.com/ishaq019/Fake-News-Detection-System
+
+
+
+---
+
