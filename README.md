@@ -1,19 +1,18 @@
-# Fake News Detection System 📰🚫
+# 📰 Fake News Detection System
 
-A full-stack web application (**React frontend + FastAPI backend**) that classifies a given news text as **Reliable** or **Unreliable** using an NLP pipeline with **TF-IDF + Logistic Regression**.
+![Fake News Detection System Banner](assets/banner.png)
 
----
+A full-stack web app (**React SPA + FastAPI API**) that classifies news text as **Reliable** or **Unreliable** using an NLP + ML pipeline (**TF-IDF (uni+bi-grams) + Logistic Regression**).
 
-## Live Links
+## 🔗 Live Links
 
 | Component | URL |
 |---|---|
-| Frontend (GitHub Pages + custom domain) | https://syedishaq.me/Fake-News-Detection-System/ |
-| Backend API (Vercel) | https://backend-hosting-fake-news-detection.vercel.app/ |
+| **Frontend (GitHub Pages + custom domain)** | https://syedishaq.me/Fake-News-Detection-System/ |
+| **Backend API (Vercel)** | https://backend-hosting-fake-news-detection.vercel.app/ |
+| **Swagger UI** | https://backend-hosting-fake-news-detection.vercel.app/docs |
 
----
-
-## Features
+## ✨ Features
 
 | Category | Feature |
 |---|---|
@@ -21,12 +20,10 @@ A full-stack web application (**React frontend + FastAPI backend**) that classif
 | NLP | Regex cleanup → lowercasing → stopwords removal (NLTK) → Porter stemming |
 | ML | TF-IDF vectorization (uni+bi-grams) + Logistic Regression classifier |
 | API | `/predict`, `/health`, `/meta`, Swagger UI at `/docs` |
-| UX | Single-page flow: paste text → click predict → see result + confidence + latency |
+| UX | Paste text → click predict → see **label + confidence + latency** |
 | Hosting | Frontend on GitHub Pages (path-based), backend on Vercel |
 
----
-
-## Tech Stack
+## 🧰 Tech Stack
 
 | Layer | Tech |
 |---|---|
@@ -36,25 +33,18 @@ A full-stack web application (**React frontend + FastAPI backend**) that classif
 | NLP | NLTK stopwords, `PorterStemmer` |
 | Hosting | GitHub Pages (frontend) + Vercel (backend) |
 
----
-
-## Architecture Overview
+## 🏗️ Architecture
 
 Browser (React SPA)
   -> FastAPI (Vercel): POST /predict
-     -> preprocess text (regex + stopwords + stemming)
-     -> TF-IDF transform (vector.pkl)
-     -> Logistic Regression inference (model.pkl)
+    -> preprocess text (regex + stopwords + stemming)
+    -> TF-IDF transform (vector.pkl)
+    -> Logistic Regression inference (model.pkl)
   <- JSON response (label + confidence + latency)
 
+📚 API Reference
 
----
-
-API Reference
-
-Base URL
-
-https://backend-hosting-fake-news-detection.vercel.app
+Base URL: https://backend-hosting-fake-news-detection.vercel.app
 
 GET /
 
@@ -74,7 +64,7 @@ Response (200):
 
 GET /meta
 
-Runtime metadata (model/vectorizer types and label mapping).
+Runtime metadata.
 
 Response (200):
 
@@ -109,23 +99,15 @@ Example Request
 
 curl -X POST "https://backend-hosting-fake-news-detection.vercel.app/predict" \
   -H "Content-Type: application/json" \
-  -d "{\"text\":\"This is a sample news paragraph long enough to test prediction.\"}"
+  -d '{"text":"This is a sample news paragraph long enough to test prediction."}'
 
 Example Response
 
-{
-  "prediction": 1,
-  "label": "Unreliable",
-  "confidence": 0.88,
-  "ms": 15
-}
+{ "prediction": 1, "label": "Unreliable", "confidence": 0.88, "ms": 15 }
 
+🚀 Installation & Usage
 
----
-
-Installation & Usage
-
-Prerequisites
+✅ Prerequisites
 
 Tool	Recommended
 
@@ -134,57 +116,55 @@ Node.js	18+
 Git	Latest
 
 
-Backend (FastAPI) — Run Locally
+🧪 Run Backend (FastAPI) Locally
 
 1. Install dependencies:
 
-
-
 pip install -r requirements.txt
+
 
 2. Start the API:
 
-
-
 python -m uvicorn api.main:app --reload --host 127.0.0.1 --port 8000
 
+
 3. Validate:
-
-
 
 http://127.0.0.1:8000/health
 
 http://127.0.0.1:8000/docs
 
 
-Frontend (React) — Run Locally
+
+
+🖥️ Run Frontend (React) Locally
 
 From your frontend directory (example: fake-news-ui/):
 
 1. Install:
 
-
-
 npm install
+
 
 2. Start dev server:
 
-
-
 npm run dev
 
+
 3. Configure API base URL:
-
-
 
 Local backend: http://127.0.0.1:8000
 
 Production backend: https://backend-hosting-fake-news-detection.vercel.app
 
 
-End-user Flow
 
-1. Open the frontend URL
+
+Tip: keep API URL in an env var like VITE_API_BASE_URL (Vite) or REACT_APP_API_BASE_URL (CRA), and commit a .env.example.
+
+✅ End-user Flow
+
+1. Open the frontend: https://syedishaq.me/Fake-News-Detection-System/
 
 
 2. Paste a news paragraph (≥ 10 characters)
@@ -199,15 +179,12 @@ classification (Reliable/Unreliable)
 
 confidence score
 
-response time
+response time (ms)
 
 
 
 
-
----
-
-ML Pipeline
+🧠 ML Pipeline
 
 Stage	Details
 
@@ -218,10 +195,7 @@ Model	LogisticRegression(max_iter=2000, n_jobs=1)
 Artifacts	vector.pkl, model.pkl
 
 
-
----
-
-Model Performance
+📈 Model Performance
 
 Training run reported:
 
@@ -230,75 +204,62 @@ Metric	Value
 Accuracy	0.9893
 
 
-Classification report (summary)
+Classification report (summary):
 
 Class 0 (Reliable): precision 0.9859, recall 0.9921, f1 0.9889
 
 Class 1 (Unreliable): precision 0.9925, recall 0.9867, f1 0.9896
 
 
-
----
-
-Deployment
+🌍 Deployment Notes
 
 Frontend (GitHub Pages under custom domain path)
 
-Hosted at:
+Hosted at: https://syedishaq.me/Fake-News-Detection-System/
 
-https://syedishaq.me/Fake-News-Detection-System/
-
-
-Important: GitHub Pages sub-path hosting requires correct base path configuration; otherwise JS/CSS assets may 404 and the page may render blank.
+Gotcha: GitHub Pages sub-path hosting requires correct base path configuration. If wrong, JS/CSS assets may 404 and the page can render blank.
 
 Backend (Vercel)
 
-Hosted at:
-
-https://backend-hosting-fake-news-detection.vercel.app/
-
+Hosted at: https://backend-hosting-fake-news-detection.vercel.app/
 
 Important checks
 
-model.pkl and vector.pkl must be included in deployment
+model.pkl and vector.pkl must ship with the deployment
 
 NLTK stopwords must be available (build-time download or runtime fallback)
 
 CORS must allow the origin: https://syedishaq.me (origin has no path)
 
 
-
----
-
-Troubleshooting
+🧯 Troubleshooting
 
 Problem	Symptom	Fix
 
 CORS blocked	“Request failed / Failed to reach backend”	Allow origin https://syedishaq.me in backend CORS
 GitHub Pages blank	Console shows JS/CSS 404	Set correct base path for subfolder deployment
 NLTK stopwords missing	LookupError: stopwords	Download stopwords at build or add runtime fallback
-Artifacts missing	Backend fails at startup	Ensure model.pkl + vector.pkl exist in expected location
+Artifacts missing	Backend fails at startup	Ensure model.pkl + vector.pkl exist where expected
 
 
+🔐 Security Note (Pickle)
 
----
+Pickle files can execute arbitrary code when loaded. Never load untrusted .pkl files and keep model.pkl / vector.pkl under your control.
 
-Contributing
+🤝 Contributing
 
 1. Fork the repository
 
 
 2. Create a feature branch:
 
-
-
 git checkout -b feature/your-feature-name
+
 
 3. Commit changes:
 
+git commit -m "Add: "
 
-
-git commit -m "Add: <short description>"
 
 4. Push and open a Pull Request
 
@@ -315,10 +276,7 @@ Add request/response examples for API changes
 Do not commit secrets (tokens/keys)
 
 
-
----
-
-Contact
+📬 Contact
 
 Type	Details
 
@@ -328,6 +286,32 @@ GitHub	https://github.com/ishaq019
 Repository	https://github.com/ishaq019/Fake-News-Detection-System
 
 
+🧾 Assumptions
 
----
+Backend entrypoint is api.main:app (FastAPI)
 
+Frontend is a React SPA deployed under the GitHub Pages sub-path
+
+
+🧭 Next Steps
+
+Add .env.example for frontend/backend configuration (API base URL, allowed origins)
+
+Add CI/CD (GitHub Actions) for automated frontend deploy and backend validation
+
+Add tests for /predict with sample inputs and expected response shape
+
+
+🎨 Generate the README Banner (DALL·E Prompt)
+
+Save the generated image as: assets/banner.png
+
+Prompt:
+
+> A modern flat vector banner for a “Fake News Detection System” web app. Include subtle icons: newspaper, shield/checkmark for reliable, warning triangle for unreliable, and small AI/ML nodes. Clean white background, minimal pastel accents, professional tech style, wide aspect ratio 3:1, no photorealism, no text artifacts.
+
+
+
+📄 License
+
+Add a license file if you plan to open-source this project (MIT is common). (If you already have one, link it here.)
