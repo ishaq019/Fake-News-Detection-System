@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import "./App.css";
 
-const API_BASE = "https://fake-news-detection-90c606d65a5a.herokuapp.com/";
+const API_BASE = "https://backend-hosting-fake-news-detection.vercel.app";
 
 export default function App() {
   const [text, setText] = useState("");
@@ -27,7 +27,7 @@ export default function App() {
 
     setLoading(true);
     try {
-      const res = await fetch(`https://fake-news-detection-90c606d65a5a.herokuapp.com/predict`, {
+      const res = await fetch(`${API_BASE}/predict`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: trimmed }),
@@ -72,7 +72,7 @@ export default function App() {
           <div className="brand">
             <h1>Fake News Detector</h1>
             <p className="sub">
-              Powered by FastAPI on Heroku. Frontend hosted on GitHub Pages.
+              Powered by FastAPI on Vercel. Frontend hosted on GitHub Pages.
             </p>
           </div>
 
@@ -156,7 +156,7 @@ export default function App() {
         <footer className="footer">
           <span>Frontend: GitHub Pages</span>
           <span className="dot">•</span>
-          <span>Backend: Heroku</span>
+          <span>Backend: Vercel</span>
         </footer>
       </div>
     </div>
