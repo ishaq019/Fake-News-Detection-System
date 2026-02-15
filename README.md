@@ -1,134 +1,343 @@
 # Fake News Detection System 📰🚫
 
-[![Python](https://img.shields.io/badge/Python-3.8%2B-blue?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-App-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io/)
-[![Scikit-Learn](https://img.shields.io/badge/scikit--learn-ML-orange?style=for-the-badge&logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
-
-An end-to-end **Natural Language Processing (NLP)** project designed to classify news articles as **Reliable** or **Unreliable**. This system utilizes a **Decision Tree Classifier** trained on a dataset of over 20,000 news articles, achieving an accuracy of **88%**. The project features a user-friendly web interface built with **Streamlit** for real-time predictions.
+A full-stack web application (**React frontend + FastAPI backend**) that classifies a given news text as **Reliable** or **Unreliable** using an NLP pipeline with **TF-IDF + Logistic Regression**.
 
 ---
 
-## 🚀 Features
+## Live Links
 
-* **Real-Time Detection:** Instant classification of news text as "Reliable" or "Unreliable" via a web GUI.
-* **Advanced Text Preprocessing:** Implements **Porter Stemming**, stop-word removal, and Regex cleaning to refine raw text data.
-* **Robust Vectorization:** Uses **TF-IDF (Term Frequency-Inverse Document Frequency)** to transform text into meaningful numerical features.
-* **High Accuracy:** Trained on the Kaggle Fake News dataset using a Decision Tree algorithm, validated with an 80/20 train-test split.
-* **Model Persistence:** Uses **Pickle** for efficient model serialization and loading.
-
----
-
-## 🛠️ Tech Stack
-
-* **Language:** Python
-* **Machine Learning:** Scikit-Learn (Decision Tree Classifier, TF-IDF Vectorizer)
-* **Data Processing:** Pandas, NumPy
-* **NLP:** NLTK (Natural Language Toolkit), Re (Regular Expressions)
-* **Web Framework:** Streamlit
-* **Deployment/Serialization:** Pickle
+| Component | URL |
+|---|---|
+| Frontend (GitHub Pages + custom domain) | https://syedishaq.me/Fake-News-Detection-System/ |
+| Backend API (Vercel) | https://backend-hosting-fake-news-detection.vercel.app/ |
 
 ---
 
-## 📂 Project Structure
+## Features
 
-```bash
-Fake-News-Detection-System/
-├── dataset/
-│   ├── train.csv          # Training dataset
-│   └── test.csv           # Testing dataset
-├── Model_Training.ipynb   # Jupyter Notebook for Data Cleaning, Preprocessing & Training
-├── app.py                 # Main Streamlit application file
-├── model.pkl              # Serialized Machine Learning Model
-├── vector.pkl             # Serialized TF-IDF Vectorizer
-├── requirements.txt       # List of dependencies
-└── README.md              # Project Documentation
-
-```
+| Category | Feature |
+|---|---|
+| Core | Predicts **Reliable** vs **Unreliable** from raw news text |
+| NLP | Regex cleanup → lowercasing → stopwords removal (NLTK) → Porter stemming |
+| ML | TF-IDF vectorization (uni+bi-grams) + Logistic Regression classifier |
+| API | `/predict`, `/health`, `/meta`, Swagger UI at `/docs` |
+| UX | Single-page flow: paste text → click predict → see result + confidence + latency |
+| Hosting | Frontend on GitHub Pages (path-based), backend on Vercel |
 
 ---
 
-## ⚙️ Installation & Usage
+## Tech Stack
 
-### 1. Clone the Repository
+| Layer | Tech |
+|---|---|
+| Frontend | React (SPA) |
+| Backend | FastAPI (Python) |
+| ML | scikit-learn (`TfidfVectorizer`, `LogisticRegression`) |
+| NLP | NLTK stopwords, `PorterStemmer` |
+| Hosting | GitHub Pages (frontend) + Vercel (backend) |
 
-```bash
-git clone [https://github.com/ishaq019/Fake-News-Detection-System.git](https://github.com/ishaq019/Fake-News-Detection-System.git)
-cd Fake-News-Detection-System
+---
 
-```
+## Architecture Overview
 
-### 2. Create a Virtual Environment (Optional but Recommended)
+Browser (React SPA) -> FastAPI (Vercel): POST /predict -> preprocess text (regex + stopwords + stemming) -> TF-IDF transform (vector.pkl) -> Logistic Regression inference (model.pkl) <- JSON response (label + confidence + latency)
 
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+---
 
-```
+## API Reference
 
-### 3. Install Dependencies
+### Base URL
+`https://backend-hosting-fake-news-detection.vercel.app`
 
-```bash
+### Endpoints
+
+#### `GET /`
+Returns a basic message.
+
+**Response (200):**
+```json
+{ "message": "API running. See /docs. Use POST /predict." }
+
+
+---
+
+GET /health
+
+Health check.
+
+Response (200):
+
+{ "ok": true }
+
+
+---
+
+GET /meta
+
+Runtime metadata (model/vectorizer types and label mapping).
+
+Response (200):
+
+{
+  "model": "LogisticRegression",
+  "vectorizer": "TfidfVectorizer",
+  "labels": { "0": "Reliable", "1": "Unreliable" }
+}
+
+
+---
+
+POST /predict
+
+Predict classification for input text.
+
+Request Body
+
+Field	Type	Constraints
+
+text	string	10–20000 chars
+
+
+Response Body
+
+Field	Type	Meaning
+
+prediction	int	0 = Reliable, 1 = Unreliable
+label	string	Human label
+confidence	float	Max predicted probability (if available)
+ms	int	Inference time (ms)
+
+
+Example Request
+
+curl -X POST "https://backend-hosting-fake-news-detection.vercel.app/predict" \
+  -H "Content-Type: application/json" \
+  -d "{\"text\":\"This is a sample news paragraph long enough to test prediction.\"}"
+
+Example Response
+
+{
+  "prediction": 1,
+  "label": "Unreliable",
+  "confidence": 0.88,
+  "ms": 15
+}
+
+
+---
+
+Installation & Usage
+
+Prerequisites
+
+Tool	Recommended
+
+Python	3.10+ (3.11 ideal)
+Node.js	18+
+Git	Latest
+
+
+
+---
+
+Backend (FastAPI) — Run Locally
+
+1. Install dependencies:
+
+
+
 pip install -r requirements.txt
 
-```
+2. Start the API:
 
-*If you don't have a requirements file yet, install manually:*
 
-```bash
-pip install pandas numpy scikit-learn nltk streamlit
 
-```
+python -m uvicorn api.main:app --reload --host 127.0.0.1 --port 8000
 
-### 4. Run the Application
+3. Test locally:
 
-```bash
-streamlit run app.py
 
-```
 
-### 5. Access the Web App
+Health: http://127.0.0.1:8000/health
 
-The application will automatically open in your browser at `http://localhost:8501`.
+Docs: http://127.0.0.1:8000/docs
+
+
 
 ---
 
-## 📊 Model Performance
+Frontend (React) — Run Locally
 
-* **Algorithm:** Decision Tree Classifier
-* **Vectorization:** TF-IDF
-* **Accuracy:** **88%** on Test Data
-* **Split Strategy:** 80% Training / 20% Testing
+From your frontend directory (example: fake-news-ui/):
 
----
+1. Install:
 
-## 📸 Screenshots
 
-*(Add screenshots of your project here to make it visually appealing)*
 
----
+npm install
 
-## 🤝 Contributing
+2. Run dev server:
 
-Contributions are welcome! If you have suggestions for improving the model accuracy or UI, feel free to fork the repo and create a pull request.
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
 
----
+npm run dev
 
-## 📞 Contact
+3. Configure API base URL:
 
-**Syed Ishaq** * **GitHub:** [ishaq019](https://www.google.com/search?q=https://github.com/ishaq019)
 
-* **LinkedIn:** [Connect with me](https://www.linkedin.com/in/s-ishaq/)
+
+Local dev backend: http://127.0.0.1:8000
+
+Production backend: https://backend-hosting-fake-news-detection.vercel.app
+
+
 
 ---
 
-*This project is for educational purposes and is based on the Kaggle Fake News dataset.*
+Using the App (End-user Flow)
 
-```
+1. Open the frontend URL
 
-```
+
+2. Paste a news paragraph (≥ 10 characters)
+
+
+3. Click Predict
+
+
+4. View:
+
+
+
+classification (Reliable/Unreliable)
+
+confidence score
+
+response time
+
+
+
+---
+
+ML Pipeline
+
+Stage	Details
+
+Labels	0 = Reliable (True), 1 = Unreliable (Fake)
+Preprocessing	letters-only regex → lowercase → stopwords removal → Porter stemming
+Vectorizer	TfidfVectorizer(max_features=10000, ngram_range=(1,2))
+Model	LogisticRegression(max_iter=2000, n_jobs=1)
+Artifacts	vector.pkl, model.pkl
+
+
+
+---
+
+Model Performance
+
+Training run reported:
+
+Metric	Value
+
+Accuracy	0.9893
+
+
+Classification Report (summary):
+
+Class 0 (Reliable): precision 0.9859, recall 0.9921, f1 0.9889
+
+Class 1 (Unreliable): precision 0.9925, recall 0.9867, f1 0.9896
+
+
+
+---
+
+Deployment
+
+Frontend (GitHub Pages under custom domain path)
+
+Hosted at:
+
+https://syedishaq.me/Fake-News-Detection-System/
+
+
+Important: GitHub Pages sub-path hosting requires correct base path configuration; otherwise JS/CSS assets may 404 and the page may render blank.
+
+
+---
+
+Backend (Vercel)
+
+Hosted at:
+
+https://backend-hosting-fake-news-detection.vercel.app/
+
+
+Important checks:
+
+model.pkl and vector.pkl must be included in deployment
+
+NLTK stopwords must be available (build-time download or runtime fallback)
+
+CORS must allow the origin: https://syedishaq.me (origin has no path)
+
+
+
+---
+
+Troubleshooting
+
+Problem	Symptom	Fix
+
+CORS blocked	“Request failed / Failed to reach backend”	Allow origin https://syedishaq.me in backend CORS
+GitHub Pages blank	Console shows JS/CSS 404	Set correct base path for subfolder deployment
+NLTK stopwords missing	LookupError: stopwords	Download stopwords at build or add runtime fallback
+Artifacts missing	Backend fails at startup	Ensure model.pkl + vector.pkl exist in expected location
+
+
+
+---
+
+Contributing
+
+1. Fork the repository
+
+
+2. Create a feature branch:
+
+
+
+git checkout -b feature/your-feature-name
+
+3. Commit changes:
+
+
+
+git commit -m "Add: <short description>"
+
+4. Push and open a Pull Request.
+
+
+
+Guidelines
+
+Keep PRs small and focused
+
+Add screenshots for UI changes
+
+Add request/response examples for API changes
+
+Do not commit secrets (tokens/keys)
+
+
+
+---
+
+Contact
+
+Type	Details
+
+Name	Ishaq
+Website	https://syedishaq.me
+GitHub	https://github.com/ishaq019
+Repository	https://github.com/ishaq019/Fake-News-Detection-System
